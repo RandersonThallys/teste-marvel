@@ -13,6 +13,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 class TableWidget extends StatelessWidget {
   final bool isMobileScreen;
   final CharacterStore store;
+
   const TableWidget({
     super.key,
     required this.isMobileScreen,
@@ -96,47 +97,75 @@ class TableWidget extends StatelessWidget {
           if (store.state is InitListCharacterState) Container(),
           if (store.state is LoadingListCharacterState)
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 205),
+              padding: const EdgeInsets.only(top: 200.0),
               child: CircularProgressIndicator(
                 color: appTheme.colors.redColor,
               ),
             ),
-          if (store.state is SuccessListCharacterState)
-            SizedBox(
-              height: 448.0,
-              child: ListView.builder(
-                itemCount: store.state.characters.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return ContentTableWidget(
-                    onTap: () {
-                      Modular.to.pushNamed(AppRoutes().herosDetails,
-                          arguments: store.state.characters[index].id);
-                    },
-                    isMobileScreen: isMobileScreen,
-                    character: store.state.characters[index],
+          if (store.state is SuccessListCharacterState &&
+              store.state.characters.isNotEmpty)
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, viewportConstraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: viewportConstraints.maxHeight,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ListView.builder(
+                            itemCount: store.state.characters.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return ContentTableWidget(
+                                onTap: () {
+                                  Modular.to.pushNamed(AppRoutes().herosDetails,
+                                      arguments: store.state.characters[index].id);
+                                },
+                                isMobileScreen: isMobileScreen,
+                                character: store.state.characters[index],
+                              );
+                            },
+                          ),
+                          Align(
+                            alignment: isMobileScreen
+                                ? Alignment.bottomCenter
+                                : Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  top: isMobileScreen ? 18 : 10,
+                                  bottom: isMobileScreen ? 24 : 16),
+                              child: PaginationWidget(
+                                isMobileScreen: isMobileScreen,
+                                store: store,
+                                onPressedNext: () {
+                                  store.nextOffset();
+                                  store.getCharacters();
+                                },
+                                onPressedPrevious: () {
+                                  store.previousOffset();
+                                  store.getCharacters();
+                                },
+                              ),
+                            ),
+                          ),
+                          if (!isMobileScreen)
+                            Container(),
+                        ],
+                      ),
+                    ),
                   );
-                },
+                }
               ),
             ),
-          SizedBox(
-            height: isMobileScreen ? 18.0 : 50.0,
-          ),
-          PaginationWidget(
-            isMobileScreen: isMobileScreen,
-            store: store,
-            onPressedNext: () {
-              store.nextOffset();
-              store.getCharacters();
-            },
-            onPressedPrevious: () {
-              store.previousOffset();
-              store.getCharacters();
-            },
-          ),
-          SizedBox(
-            height: isMobileScreen ? 24 : 16.0,
-          ),
+          if (store.state is SuccessListCharacterState &&
+              store.state.characters.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 200.0),
+              child: Text('Personagem não encontrado!'),
+            ),
         ],
       );
     });

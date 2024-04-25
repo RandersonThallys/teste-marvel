@@ -1,9 +1,7 @@
-import 'package:code_hero/src/core/interactor/entities/character_entity.dart';
 import 'package:code_hero/src/core/interactor/stories/character_store.dart';
 import 'package:code_hero/src/core/ui/app_theme.dart';
 import 'package:code_hero/src/core/ui/widgets/pagination_number_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 class PaginationWidget extends StatelessWidget {
@@ -42,9 +40,10 @@ class PaginationWidget extends StatelessWidget {
         SingleChildScrollView(
           child: SizedBox(
             height: 32.0,
-            width: MediaQuery.sizeOf(context).width * 0.25,
+            width: isMobileScreen ? 150.0 : 310.0,
             child: Center(
               child: ListView.builder(
+                  key: const PageStorageKey<String>('page'),
                   scrollDirection: Axis.horizontal,
                   shrinkWrap: true,
                   itemCount: (store.state.totalResult / 4).ceil(),
@@ -65,13 +64,13 @@ class PaginationWidget extends StatelessWidget {
           width: isMobileScreen ? 32.0 : 2.0,
         ),
         GestureDetector(
-          onTap: store.index == (store.state.totalResult / 4).ceil()
+          onTap: store.index == (store.state.totalResult / 4).ceil() - 1
               ? null
               : onPressedNext,
           child: Icon(
             Icons.arrow_right,
             size: isMobileScreen ? 56.0 : 40.0,
-            color: store.index == (store.state.totalResult / 4).ceil()
+            color: store.index == (store.state.totalResult / 4).ceil() - 1
                 ? appTheme.colors.redColor.withOpacity(0.5)
                 : appTheme.colors.redColor,
           ),

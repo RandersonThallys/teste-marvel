@@ -7,6 +7,7 @@ class TextfieldWidget extends StatelessWidget {
   final double? height;
   final double? width;
   final TextEditingController? controller;
+  final ValueChanged? onChanged;
   final Function(String)? onPressed;
   const TextfieldWidget({
     super.key,
@@ -15,6 +16,7 @@ class TextfieldWidget extends StatelessWidget {
     this.width,
     this.controller,
     this.onPressed,
+    this.onChanged,
   });
 
   @override
@@ -32,6 +34,7 @@ class TextfieldWidget extends StatelessWidget {
           width: width,
           child: TextFormField(
             controller: controller,
+            onChanged: onChanged,
             onFieldSubmitted: onPressed,
             decoration: InputDecoration(
                 border: OutlineInputBorder(

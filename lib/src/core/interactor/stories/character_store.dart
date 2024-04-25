@@ -24,9 +24,6 @@ abstract class CharacterStoreBase with Store {
   @observable
   int index = 0;
 
-  @observable
-  int limitPages = 0;
-
   TextEditingController controller = TextEditingController();
 
   @action
@@ -51,6 +48,10 @@ abstract class CharacterStoreBase with Store {
 
   @action
   Future<void> getCharacters() async {
+    if (controller.text.isNotEmpty) {
+      offset = 0;
+      index = 0;
+    }
     state = state.loading();
     state = await characterRepository.getCharacter(
         offSet: offset, name: controller.text.isEmpty ? null : controller.text);
